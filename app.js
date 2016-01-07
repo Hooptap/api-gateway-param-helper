@@ -54,19 +54,20 @@ let updateMethodIntegration = (apiId, resourceId, methodVerb, type) => {
   };
 }
 
-let updateResource = (resource, key, callback) => {
+let updateResource = (resource, key, onFinishedResource) => {
   if( resource.resourceMethods ){
+
     let methods = getMethodsArray(resource.resourceMethods);
-    let tasks = [];
-    for (var i = 0; i < methods.length; i++) {
-      let methodVerb = methods[i];
+    async.forEachOfSeries(methods, function(method, key, onMethodFinished){
+      let tasks = [];
+      let methodVerb = method;
       tasks.push(updateMethodMethod(apiId, resource.id, methodVerb));
       tasks.push(updateMethodIntegration(apiId, resource.id, methodVerb));
-    }
-
-    async.series(tasks, (err, results) => {
-      // callback(err);
-      callback();
+      async.series(tasks, (err, results) => {
+        onMethodFinished();
+      });
+    }, function(){
+      onFinishedResource();
     });
   }
   else{
