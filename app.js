@@ -65,7 +65,8 @@ let updateResource = (resource, key, callback) => {
     }
 
     async.series(tasks, (err, results) => {
-      callback(err);
+      // callback(err);
+      callback();
     });
   }
   else{
